@@ -89,13 +89,20 @@ class views_menu_children_argument extends views_handler_argument_numeric {
   /**
    * Gets the direct decedents of a node as structured in the target menu.
    *
-   * @param integer $parent_nid
+   * @param $parent_argument
    * @param string $menu_name
    * @return array|null
    */
-  static function get_child_node_nids($parent_nid, $menu_name) {
+  static function get_child_node_nids($parent_argument, $menu_name) {
     $nids = array();
-    $parent = menu_link_get_preferred('node/' . $parent_nid, $menu_name);
+    // If the parent_argument is an integer, we assume the parent is a node.
+    if(is_int($parent_argument)) {
+      $parent = menu_link_get_preferred('node/' . $parent_argument, $menu_name);
+    }
+    else {
+      // We are assuming that the supplied parent argument is a path
+      $parent = menu_link_get_preferred($parent_argument, $menu_name);
+    }
     $parameters = array(
       'active_trail' => array($parent['plid']),
       'only_active_trail' => FALSE,
