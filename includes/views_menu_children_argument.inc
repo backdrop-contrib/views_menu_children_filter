@@ -96,7 +96,7 @@ class views_menu_children_argument extends views_handler_argument_numeric {
   static function get_child_node_nids($parent_argument, $menu_name) {
     $nids = array();
     // If the parent_argument is an integer, we assume the parent is a node.
-    if(is_int($parent_argument)) {
+    if(is_numeric($parent_argument)) {
       $parent = menu_link_get_preferred('node/' . $parent_argument, $menu_name);
     }
     else {
