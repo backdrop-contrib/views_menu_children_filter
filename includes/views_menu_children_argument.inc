@@ -110,6 +110,10 @@ class views_menu_children_argument extends views_handler_argument_numeric {
       'max_depth' => $parent['depth'] + 1,
       'conditions' => array('plid' => $parent['mlid']),
     );
+    
+    // Until the issue in Drupal core gets resolved, we'll need to manually reset the static cache.
+    // See: https://www.drupal.org/node/1697570
+    drupal_static_reset('_menu_build_tree');
 
     $children = menu_build_tree($parent['menu_name'], $parameters);
     if (!empty($children)) {
