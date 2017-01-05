@@ -82,6 +82,11 @@ class views_menu_children_argument extends views_handler_argument_numeric {
           0,
           "$this->table_alias.nid $operator($placeholder) $null_check"
           , array($placeholder => $child_nodes));
+
+        $this->query->add_where_expression(
+          0,
+          "menu_links.menu_name = :targetmenu"
+          , array(':targetmenu' => $this->options['target_menu']));
       }
     }
   }
@@ -110,7 +115,7 @@ class views_menu_children_argument extends views_handler_argument_numeric {
       'max_depth' => $parent['depth'] + 1,
       'conditions' => array('plid' => $parent['mlid']),
     );
-    
+
     // Until the issue in Drupal core gets resolved, we'll need to manually reset the static cache.
     // See: https://www.drupal.org/node/1697570
     drupal_static_reset('_menu_build_tree');
