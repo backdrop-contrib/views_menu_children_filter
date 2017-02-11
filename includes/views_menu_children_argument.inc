@@ -60,6 +60,10 @@ class views_menu_children_argument extends views_handler_argument_numeric {
 
   function query($group_by = FALSE) {
     $this->ensure_my_table();
+    $menu_name = $this->options['target_menu'];
+
+    // The magic sauce! Joining the menu_links table onto the node table ;)
+    self::joinMenuLinksTableToNode($this->query, $menu_name);
 
     if (!empty($this->options['break_phrase'])) {
       views_break_phrase($this->argument, $this);
@@ -68,66 +72,51 @@ class views_menu_children_argument extends views_handler_argument_numeric {
       $this->value = array($this->argument);
     }
 
-    $placeholder = $this->placeholder();
-    $null_check = empty($this->options['not']) ? '' : "OR $this->table_alias.$this->real_field IS NULL";
+    $page_identifier = reset($this->value);
 
-    $target_nid = reset($this->value);
-    if (!empty($target_nid)) {
-      // Get the node details
-      $child_nodes = self::get_child_node_nids($target_nid, $this->options['target_menu']);
+    if (!empty($page_identifier)) {
 
-      if (count($this->value) >= 1) {
-        $operator = empty($this->options['not']) ? 'IN' : 'NOT IN';
-        $this->query->add_where_expression(
-          0,
-          "$this->table_alias.nid $operator($placeholder) $null_check"
-          , array($placeholder => $child_nodes));
-
-        $this->query->add_where_expression(
-          0,
-          "menu_links.menu_name = :targetmenu"
-          , array(':targetmenu' => $this->options['target_menu']));
+      // If the value is an integer, we assume it is a node ID.
+      if(is_numeric($page_identifier)) {
+        $page_identifier = "node/$page_identifier";
       }
+      self::filterByParentPage($page_identifier, $menu_name, $this->query);
     }
   }
 
   /**
-   * Gets the direct decedents of a node as structured in the target menu.
-   *
-   * @param $parent_argument
-   * @param string $menu_name
-   * @return array|null
+   * @param string|integer $page_identifier The menu_item table's link_path. I.e.: node/100 (Supports an integer to default to node/%)
+   * @param string $menu_name The menu's machine name we want to filter by.
+   * @param \views_plugin_query $query The query we're going to alter.
    */
-  static function get_child_node_nids($parent_argument, $menu_name) {
-    $nids = array();
-    // If the parent_argument is an integer, we assume the parent is a node.
-    if(is_numeric($parent_argument)) {
-      $parent = menu_link_get_preferred('node/' . $parent_argument, $menu_name);
-    }
-    else {
-      // We are assuming that the supplied parent argument is a path
-      $parent = menu_link_get_preferred($parent_argument, $menu_name);
-    }
-    $parameters = array(
-      'active_trail' => array($parent['plid']),
-      'only_active_trail' => FALSE,
-      'min_depth' => $parent['depth'] + 1,
-      'max_depth' => $parent['depth'] + 1,
-      'conditions' => array('plid' => $parent['mlid']),
+  public static function filterByParentPage($page_identifier, $menu_name, \views_plugin_query $query) {
+    // Get the parent page menu item details.
+    $parent = menu_link_get_preferred($page_identifier, $menu_name);
+
+    $query->add_where_expression(
+      0,
+      'menu_links.plid = :parent_lid',
+      array(':parent_lid' => $parent['mlid'])
+    );
+  }
+
+  /**
+   * @param \views_plugin_query $query
+   * @param string $menu_name The menu's machine name we want to filter by.
+   */
+  public static function joinMenuLinksTableToNode(\views_plugin_query $query, $menu_name) {
+    // We need to join on the menu_links table.
+    // Use our special views_join object to accomplish this.
+    $join = new views_menu_children_join();
+    $join->prefixes[] = 'node/';
+    $query->queue_table("menu_links", "node", $join);
+
+    $query->add_where_expression(
+      0,
+      "menu_links.menu_name = :targetmenu"
+      , array(':targetmenu' => $menu_name)
     );
 
-    // Until the issue in Drupal core gets resolved, we'll need to manually reset the static cache.
-    // See: https://www.drupal.org/node/1697570
-    drupal_static_reset('_menu_build_tree');
-
-    $children = menu_build_tree($parent['menu_name'], $parameters);
-    if (!empty($children)) {
-      foreach ($children as $menu_link) {
-        $nids[] = str_replace('node/', '', $menu_link['link']['link_path']);
-      }
-      return $nids;
-    }
-
-    return NULL;
   }
+
 }
