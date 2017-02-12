@@ -109,6 +109,7 @@ class views_menu_children_argument extends views_handler_argument_numeric {
     // Use our special views_join object to accomplish this.
     $join = new views_menu_children_join();
     $join->prefixes[] = 'node/';
+    drupal_alter('views_menu_children_filter_join', $join->prefixes, $menu_name, $query);
     $query->queue_table("menu_links", "node", $join);
 
     $query->add_where_expression(
