@@ -31,6 +31,7 @@ class views_menu_children_argument extends views_handler_argument_numeric {
       $menus[$menu['menu_name']] = $menu['title'];
     }
     asort($menus);
+    $form['default_action']["#options"]['root_nodes'] = t('Display root nodes only.');
 
     unset($form['not']);
     unset($form['break_phrase']);
@@ -74,24 +75,29 @@ class views_menu_children_argument extends views_handler_argument_numeric {
 
     $page_identifier = reset($this->value);
 
-    if (!empty($page_identifier)) {
-
-      // If the value is an integer, we assume it is a node ID.
-      if(is_numeric($page_identifier)) {
-        $page_identifier = "node/$page_identifier";
-      }
-      self::filterByParentPage($page_identifier, $menu_name, $this->query);
+    // If the value is an integer, we assume it is a node ID.
+    if(is_numeric($page_identifier) && $page_identifier != "0") {
+      $page_identifier = "node/$page_identifier";
     }
+    self::filterByParentPage($page_identifier, $menu_name, $this->query);
   }
 
   /**
-   * @param string|integer $page_identifier The menu_item table's link_path. I.e.: node/100 (Supports an integer to default to node/%)
+   * Filter the query by either a: parent node, page page via its link_path, or null and limit to root nodes.
+   *
+   * @param null|string|integer $page_identifier The menu_item table's link_path. I.e.: node/100 (Supports an integer to default to node/%)
    * @param string $menu_name The menu's machine name we want to filter by.
    * @param \views_plugin_query $query The query we're going to alter.
    */
   public static function filterByParentPage($page_identifier, $menu_name, \views_plugin_query $query) {
-    // Get the parent page menu item details.
-    $parent = menu_link_get_preferred($page_identifier, $menu_name);
+    // If not page identifier is provided, select only root nodes of the menu.
+    if(empty($page_identifier)) {
+      $parent['mlid'] = 0;
+    }
+    else {
+      // Get the parent page menu item details.
+      $parent = menu_link_get_preferred($page_identifier, $menu_name);
+    }
 
     $query->add_where_expression(
       0,
@@ -120,4 +126,16 @@ class views_menu_children_argument extends views_handler_argument_numeric {
 
   }
 
+  /**
+   * Determine if the argument is set to provide a default argument.
+   */
+  function has_default_argument() {
+    return ($this->options['default_action'] == 'root_nodes'
+      ? true
+      : parent::has_default_argument());
+  }
+
+  function get_default_argument() {
+    return "0";
+  }
 }
