@@ -27,23 +27,29 @@ class views_menu_children_argument extends views_handler_argument_numeric {
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
-    foreach (menu_load_all() as $menu) {
-      $menus[$menu['menu_name']] = $menu['title'];
-    }
-    asort($menus);
     $form['default_action']["#options"]['root_nodes'] = t('Display root nodes only.');
 
     unset($form['not']);
     unset($form['break_phrase']);
 
+    self::buildMenuSelectForm($form, $form_state, $this->options['target_menu']);
+  }
+
+  public static function buildMenuSelectForm(&$form, &$form_state, $default_menu) {
+    foreach (menu_load_all() as $menu) {
+      $menus[$menu['menu_name']] = $menu['title'];
+    }
+    asort($menus);
+
     $form['target_menu'] = array(
       '#type' => 'select',
       '#title' => t('Target menu'),
       '#description' => t('Select the menu to scan for child nodes.'),
-      '#default_value' => $this->options['target_menu'],
+      '#default_value' => $default_menu,
       '#required' => TRUE,
       '#options' => array_merge(array('' => t('-- Select menu --')), $menus),
     );
+
   }
 
   function title() {
@@ -109,8 +115,15 @@ class views_menu_children_argument extends views_handler_argument_numeric {
   /**
    * @param \views_plugin_query $query
    * @param string $menu_name The menu's machine name we want to filter by.
+   * @param bool $allow_duplicate_join If "false", prevents this join from joining more than once if this function is called repeatedly.
    */
-  public static function joinMenuLinksTableToNode(\views_plugin_query $query, $menu_name) {
+  public static function joinMenuLinksTableToNode(\views_plugin_query $query, $menu_name, $allow_duplicate_join = false) {
+    // Because this can be called from the argument and sort handlers,
+    // first check to see if the join as already been applied.
+    if(!$allow_duplicate_join && isset($query->tables['node']['menu_links'])) {
+      return;
+    }
+
     // We need to join on the menu_links table.
     // Use our special views_join object to accomplish this.
     $join = new views_menu_children_join();

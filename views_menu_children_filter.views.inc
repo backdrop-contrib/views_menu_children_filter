@@ -11,4 +11,11 @@ function views_menu_children_filter_views_data_alter(&$data) {
       'handler' => 'views_menu_children_argument'
     ),
   );
+  $data['node']['menu_children_sort'] = array(
+    'title' => t('Menu children'),
+    'help' => t('Sorts by the node\'s weight in the selected menu.'),
+    'sort' => array(
+      'handler' => 'views_menu_children_sort_handler'
+    ),
+  );
 }

@@ -4,4 +4,5 @@ core = 7.x
 dependencies[] = views
 
 files[] = 'includes/views_menu_children_argument.inc'
+files[] = 'includes/views_menu_children_sort_handler.inc'
 files[] = 'includes/views_menu_children_join.inc'
