@@ -21,6 +21,10 @@ class views_menu_children_argument extends views_handler_argument_numeric {
       'default' => ''
     );
 
+    $options['filter_disabled_items'] = array(
+      'default' => '0'
+    );
+
     return $options;
   }
 
@@ -32,7 +36,16 @@ class views_menu_children_argument extends views_handler_argument_numeric {
     unset($form['not']);
     unset($form['break_phrase']);
 
+    // Add the target menu config element.
     self::buildMenuSelectForm($form, $form_state, $this->options['target_menu']);
+
+    // Add the checkbox to conditionally honor the menu item enabled state.
+    $form['filter_disabled_items'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Hide nodes who\'s menu link is disabled?'),
+      '#return_value' => "1",
+      '#default_value' => (!empty($this->options['filter_disabled_items'])),
+    );
   }
 
   public static function buildMenuSelectForm(&$form, &$form_state, $default_menu) {
@@ -86,6 +99,13 @@ class views_menu_children_argument extends views_handler_argument_numeric {
       $page_identifier = "node/$page_identifier";
     }
     self::filterByParentPage($page_identifier, $menu_name, $this->query);
+    $this->filterDisabledNodesLinks($this->query);
+  }
+
+  public function filterDisabledNodesLinks(\views_plugin_query $query) {
+    if(!empty($this->options['filter_disabled_items'])) {
+      $query->add_where_expression(0, 'menu_links.hidden <> 1', array());
+    }
   }
 
   /**
