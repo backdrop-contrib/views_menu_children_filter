@@ -39,6 +39,7 @@ class views_menu_children_sort_handler extends  \views_handler_sort {
     $this->ensure_my_table();
     // Add the field.
     $this->query->add_orderby($this->table_alias, $this->real_field, $this->options['order']);
+    $this->query->add_orderby($this->table_alias, 'link_title', $this->options['order']);
     $this->query->add_orderby($this->table_alias, 'mlid', $this->options['order']);
   }
 
