@@ -168,7 +168,16 @@ class views_menu_children_argument extends views_handler_argument_numeric {
       : parent::has_default_argument());
   }
 
+  /**
+   * Overrides the views_handler_argument_numeric::get_default_argument().
+   *
+   * If the default action is root_nodes defined here, returns the appropriate
+   * value.
+   */
   function get_default_argument() {
-    return "0";
+    if ($this->options['default_action'] == 'root_nodes') {
+      return '0';
+    }
+    return parent::get_default_argument();
   }
 }
