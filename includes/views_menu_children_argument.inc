@@ -121,6 +121,9 @@ class views_menu_children_argument extends views_handler_argument_numeric {
       $parent['mlid'] = 0;
     }
     else {
+      // Convert potential aliases to the system path.
+      $page_identifier = drupal_get_normal_path($page_identifier);
+      
       // Get the parent page menu item details.
       $parent = menu_link_get_preferred($page_identifier, $menu_name);
     }
