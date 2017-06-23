@@ -8,3 +8,11 @@ function views_menu_children_filter_views_api() {
     'api' => 3,
   );
 }
+
+function views_menu_children_filter_autoload_info() {
+  return array(
+    'views_menu_children_argument' => 'includes/views_menu_children_argument.inc',
+    'views_menu_children_sort_handler' => 'includes/views_menu_children_sort_handler.inc',
+    'views_menu_children_join' => 'includes/views_menu_children_join.inc',
+  );
+}

@@ -31,7 +31,7 @@ class views_menu_children_argument extends views_handler_argument_numeric {
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
-    $form['default_action']["#options"]['root_nodes'] = t('Display root nodes only.');
+    $form['default_action']["#options"]['root_nodes'] = t('Display root level content only.');
 
     unset($form['not']);
     unset($form['break_phrase']);
@@ -42,7 +42,7 @@ class views_menu_children_argument extends views_handler_argument_numeric {
     // Add the checkbox to conditionally honor the menu item enabled state.
     $form['filter_disabled_items'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Hide nodes who\'s menu link is disabled?'),
+      '#title' => t('Hide content whose menu link is disabled?'),
       '#return_value' => "1",
       '#default_value' => (!empty($this->options['filter_disabled_items'])),
     );
@@ -57,7 +57,7 @@ class views_menu_children_argument extends views_handler_argument_numeric {
     $form['target_menu'] = array(
       '#type' => 'select',
       '#title' => t('Target menu'),
-      '#description' => t('Select the menu to scan for child nodes.'),
+      '#description' => t('Select the menu to scan for child content.'),
       '#default_value' => $default_menu,
       '#required' => TRUE,
       '#options' => array_merge(array('' => t('-- Select menu --')), $menus),
@@ -122,7 +122,7 @@ class views_menu_children_argument extends views_handler_argument_numeric {
     }
     else {
       // Convert potential aliases to the system path.
-      $page_identifier = drupal_get_normal_path($page_identifier);
+      $page_identifier = backdrop_get_normal_path($page_identifier);
       
       // Get the parent page menu item details.
       $parent = menu_link_get_preferred($page_identifier, $menu_name);
@@ -151,7 +151,7 @@ class views_menu_children_argument extends views_handler_argument_numeric {
     // Use our special views_join object to accomplish this.
     $join = new views_menu_children_join();
     $join->prefixes[] = 'node/';
-    drupal_alter('views_menu_children_filter_join', $join->prefixes, $menu_name, $query);
+    backdrop_alter('views_menu_children_filter_join', $join->prefixes, $menu_name, $query);
     $query->queue_table("menu_links", "node", $join);
 
     $query->add_where_expression(

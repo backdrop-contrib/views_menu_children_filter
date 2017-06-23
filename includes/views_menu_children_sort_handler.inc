@@ -1,6 +1,6 @@
 <?php
 
-class views_menu_children_sort_handler extends  \views_handler_sort {
+class views_menu_children_sort_handler extends \views_handler_sort {
 
   function set_definition($definition) {
     $this->table_alias = 'menu_links';
