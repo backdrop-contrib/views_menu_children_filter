@@ -13,8 +13,10 @@ of a specific page in the Primary navigation.
  - Install this module using the official 
   [Backdrop CMS instructions](https://backdropcms.org/guide/modules)
  - Create a view that selects `Content`.
- - Add the "Menu children" contextual filter. Specify the menu that the filter should target (required field).
- - Provide a Content ID or path to a parent page that you want to display the child content from.
+ - Add the "Menu children" contextual filter. Specify the menu that the filter 
+ should target (required field).
+ - Provide a Content ID or path to a parent page that you want to display the 
+ child content from.
 
 ## Issues
 
@@ -29,7 +31,8 @@ Bugs and Feature requests should be reported in the
 ## Credits
 
 - Ported to Backdrop CMS by [Laryn Kragt Bakker](https://github.com/laryn) - [CEDC.org](https://cedc.org).
-- Maintainers for Drupal: [Brian Young/cravecode](https://www.drupal.org/u/cravecode) and [Ben McClure/bmcclure](https://www.drupal.org/u/bmcclure).
+- Maintainers for Drupal: [Brian Young/cravecode](https://www.drupal.org/u/cravecode) 
+and [Ben McClure/bmcclure](https://www.drupal.org/u/bmcclure).
 
 ## License
 
