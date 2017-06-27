@@ -42,7 +42,7 @@ class views_menu_children_argument extends views_handler_argument_numeric {
     // Add the checkbox to conditionally honor the menu item enabled state.
     $form['filter_disabled_items'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Hide nodes who\'s menu link is disabled?'),
+      '#title' => t('Hide nodes whose menu link is disabled?'),
       '#return_value' => "1",
       '#default_value' => (!empty($this->options['filter_disabled_items'])),
     );
