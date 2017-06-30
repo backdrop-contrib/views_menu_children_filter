@@ -126,6 +126,12 @@ class views_menu_children_argument extends views_handler_argument_numeric {
       
       // Get the parent page menu item details.
       $parent = menu_link_get_preferred($page_identifier, $menu_name);
+
+      // When a link was not found for the $page_identifier,
+      // return zero results.
+      if($parent === FALSE) {
+        $parent['mlid'] = -1;
+      }
     }
 
     $query->add_where_expression(
