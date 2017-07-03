@@ -122,7 +122,11 @@ class views_menu_children_argument extends views_handler_argument_numeric {
     }
     else {
       // Convert potential aliases to the system path.
-      $page_identifier = backdrop_get_normal_path($page_identifier);
+      if (function_exists('backdrop_get_normal_path')) {
+        $page_identifier = backdrop_get_normal_path($page_identifier);
+      } else {
+        $page_identifier = drupal_get_normal_path($page_identifier);
+      }
       
       // Get the parent page menu item details.
       $parent = menu_link_get_preferred($page_identifier, $menu_name);
@@ -157,7 +161,11 @@ class views_menu_children_argument extends views_handler_argument_numeric {
     // Use our special views_join object to accomplish this.
     $join = new views_menu_children_join();
     $join->prefixes[] = 'node/';
-    backdrop_alter('views_menu_children_filter_join', $join->prefixes, $menu_name, $query);
+    if (function_exists('backdrop_alter')) {
+      backdrop_alter('views_menu_children_filter_join', $join->prefixes, $menu_name, $query);
+    } else {
+      drupal_alter('views_menu_children_filter_join', $join->prefixes, $menu_name, $query);
+    }
     $query->queue_table("menu_links", "node", $join);
 
     $query->add_where_expression(
