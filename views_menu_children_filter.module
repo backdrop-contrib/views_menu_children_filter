@@ -1,16 +1,12 @@
 <?php
 
 /**
- * Add the views .inc file.
- */
-module_load_include('inc', 'views_menu_children_filter', 'views_menu_children_filter.views');
-
-/**
  * Implements hook_views_api().
  */
 function views_menu_children_filter_views_api() {
   return array(
     'api' => 3,
+    'path' => backdrop_get_path('module', 'views_menu_children_filter') . '/views',
   );
 }
 
